@@ -1,0 +1,176 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #222;
+}
+
+
+/* MENU */
+
+.navbar {
+    height: 70px;
+    background: #111;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 8%;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar nav {
+    display: flex;
+    gap: 25px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    color: #f58220;
+}
+
+
+/* HERO */
+
+.hero {
+    min-height: 420px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 60px 8%;
+
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.55)
+        ),
+        url("../img/montanas.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-contenido {
+    max-width: 700px;
+    color: white;
+}
+
+.hero-superior {
+    color: #f58220;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.hero h1 {
+    font-size: 58px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.boton {
+    display: inline-block;
+
+    margin-top: 30px;
+    padding: 14px 25px;
+
+    background: #f58220;
+    color: white;
+
+    text-decoration: none;
+    font-weight: bold;
+
+    border-radius: 5px;
+}
+
+
+/* DISTANCIAS */
+
+.distancias {
+    padding: 70px 8%;
+    text-align: center;
+}
+
+.distancias h2 {
+    font-size: 36px;
+}
+
+.subtitulo {
+    margin-top: 10px;
+    color: #666;
+}
+
+.grid-distancias {
+    margin-top: 40px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 25px;
+}
+
+.card-distancia {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.card-distancia h3 {
+    font-size: 22px;
+}
+
+.kilometros {
+    font-size: 48px;
+    font-weight: bold;
+
+    color: #f58220;
+
+    margin: 20px 0;
+}
+
+.kilometros span {
+    font-size: 18px;
+}
+
+.card-distancia p {
+    color: #666;
+}
+
+
+/* FOOTER */
+
+footer {
+    background: #111;
+    color: #aaa;
+
+    text-align: center;
+
+    padding: 25px;
+}

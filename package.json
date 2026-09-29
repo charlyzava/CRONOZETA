@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "easy-ftp": "^0.4.2"
+  }
+}
