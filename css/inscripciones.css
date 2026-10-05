@@ -1,0 +1,462 @@
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f3f4f6;
+    color: #222;
+}
+
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.contenedor {
+    width: 95%;
+    max-width: 1500px;
+
+    margin: 30px auto;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    background: #ffffff;
+
+    padding: 25px 30px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+    margin-bottom: 20px;
+}
+
+.encabezado h1 {
+    margin: 0 0 6px 0;
+
+    font-size: 30px;
+
+    color: #222;
+}
+
+.encabezado p {
+    margin: 0;
+
+    color: #777;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   BOTÓN NUEVO
+========================================================= */
+
+.btn-nuevo {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    background: #f57c00;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+    border-radius: 8px;
+
+    transition: 0.2s;
+}
+
+.btn-nuevo:hover {
+    background: #d96500;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BUSCADOR
+========================================================= */
+
+.busqueda {
+    background: #ffffff;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+
+    margin-bottom: 15px;
+}
+
+.busqueda form {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+.busqueda input {
+    flex: 1;
+
+    min-width: 280px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.busqueda input:focus {
+    border-color: #f57c00;
+
+    box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.12);
+}
+
+.busqueda button {
+    padding: 12px 20px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #333;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.busqueda button:hover {
+    background: #111;
+}
+
+.busqueda a {
+    display: inline-block;
+
+    padding: 12px 16px;
+
+    color: #555;
+
+    text-decoration: none;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    background: #fff;
+
+    transition: 0.2s;
+}
+
+.busqueda a:hover {
+    background: #f5f5f5;
+}
+
+
+/* =========================================================
+   INFORMACIÓN DE RESULTADOS
+========================================================= */
+
+.resultado-info {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 12px;
+
+    padding: 0 5px;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+.resultado-info strong {
+    color: #222;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.tabla-contenedor {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 1100px;
+}
+
+thead {
+    background: #252525;
+
+    color: white;
+}
+
+th {
+    padding: 14px 12px;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.3px;
+
+    white-space: nowrap;
+}
+
+td {
+    padding: 13px 12px;
+
+    border-bottom: 1px solid #e8e8e8;
+
+    font-size: 14px;
+
+    vertical-align: middle;
+}
+
+tbody tr {
+    transition: background 0.15s;
+}
+
+tbody tr:hover {
+    background: #fff8f1;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   DORSAL
+========================================================= */
+
+td:first-child strong {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 45px;
+
+    padding: 6px 9px;
+
+    background: #f57c00;
+
+    color: white;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TEXTOS SECUNDARIOS
+========================================================= */
+
+small {
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.acciones {
+    white-space: nowrap;
+}
+
+.btn-editar,
+.btn-eliminar {
+    display: inline-block;
+
+    padding: 7px 10px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    margin-right: 4px;
+
+    transition: 0.2s;
+}
+
+.btn-editar {
+    background: #e9f2ff;
+
+    color: #1769aa;
+}
+
+.btn-editar:hover {
+    background: #d5e7ff;
+}
+
+.btn-eliminar {
+    background: #ffe8e8;
+
+    color: #c62828;
+}
+
+.btn-eliminar:hover {
+    background: #ffd4d4;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+td:nth-child(9) {
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   CUANDO NO HAY RESULTADOS
+========================================================= */
+
+tbody td[colspan] {
+    padding: 40px 20px;
+
+    color: #777;
+
+    text-align: center;
+}
+
+tbody td[colspan] strong {
+    color: #222;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .contenedor {
+        width: 96%;
+
+        margin: 15px auto;
+    }
+
+    .encabezado {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        padding: 20px;
+    }
+
+    .encabezado h1 {
+        font-size: 24px;
+    }
+
+    .btn-nuevo {
+        text-align: center;
+    }
+
+    .busqueda {
+        padding: 15px;
+    }
+
+    .busqueda form {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .busqueda input {
+        min-width: 0;
+
+        width: 100%;
+    }
+
+    .busqueda button,
+    .busqueda a {
+        width: 100%;
+
+        text-align: center;
+    }
+
+    .resultado-info {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+}
+

@@ -1,0 +1,445 @@
+/* =========================================================
+   CRONOTRAIL
+   ACREDITACIÓN
+========================================================= */
+
+.acreditacion-contenedor {
+    width: 94%;
+    max-width: 950px;
+    margin: 35px auto 50px;
+}
+
+
+/* =========================================================
+   CABECERA
+========================================================= */
+
+.acreditacion-cabecera {
+    margin-bottom: 20px;
+}
+
+.acreditacion-cabecera h1 {
+    margin: 0 0 6px;
+    font-size: 32px;
+    color: #222;
+}
+
+.acreditacion-cabecera p {
+    margin: 0;
+    color: #777;
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.acreditacion-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   MENSAJES
+========================================================= */
+
+.acreditacion-mensaje,
+.acreditacion-error {
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.acreditacion-mensaje {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.acreditacion-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* =========================================================
+   BUSCAR DNI
+========================================================= */
+
+.busqueda-dni {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.busqueda-dni .campo {
+    flex: 1;
+}
+
+.busqueda-dni .boton {
+    margin-top: 0;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CAMPOS
+========================================================= */
+
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.campo input,
+.campo select {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background: white;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: #f58220;
+
+    box-shadow:
+        0 0 0 3px rgba(245, 130, 32, 0.12);
+}
+
+
+/* =========================================================
+   DNI
+========================================================= */
+
+.campo-dni {
+    margin-bottom: 0;
+}
+
+.campo-dni input {
+    height: 52px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   DATOS DEL CORREDOR
+========================================================= */
+
+.datos-corredor {
+    background: #f7f7f7;
+
+    border: 1px solid #e8e8e8;
+
+    padding: 18px;
+
+    border-radius: 8px;
+
+    margin-bottom: 25px;
+
+    line-height: 1.7;
+}
+
+.datos-corredor .nombre {
+    display: block;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    color: #222;
+
+    margin-bottom: 5px;
+}
+
+
+/* =========================================================
+   SEPARADOR
+========================================================= */
+
+.separador {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 25px 0;
+}
+
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+.formulario-acreditacion {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+.formulario-acreditacion .campo-completo {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   REMERA
+========================================================= */
+
+.opciones-radio {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+    min-height: 46px;
+}
+
+.opciones-radio label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin: 0;
+
+    font-weight: normal;
+
+    cursor: pointer;
+}
+
+.opciones-radio input {
+    width: auto;
+    height: auto;
+
+    accent-color: #f58220;
+}
+
+
+/* =========================================================
+   RANGO DE DORSALES
+========================================================= */
+
+.rango-dorsal {
+    margin-top: 6px;
+
+    color: #666;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   PRECIO
+========================================================= */
+
+.precio-panel {
+    background: #fafafa;
+
+    border: 1px solid #eee;
+
+    border-radius: 8px;
+
+    padding: 18px;
+
+    margin-top: 5px;
+}
+
+.precio-panel label {
+    display: block;
+
+    font-weight: bold;
+
+    color: #333;
+
+    margin-bottom: 5px;
+}
+
+.precio {
+    font-size: 30px;
+
+    font-weight: bold;
+
+    color: #f58220;
+}
+
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.acciones-acreditacion {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 10px;
+
+    padding-top: 25px;
+
+    border-top: 1px solid #eee;
+}
+
+.acciones-acreditacion .boton {
+    margin-top: 0;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   BOTÓN PRINCIPAL
+========================================================= */
+
+.boton-acreditar {
+    min-height: 48px;
+
+    padding: 0 22px;
+
+    background: #f58220;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 6px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.boton-acreditar:hover {
+    background: #d96f14;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .acreditacion-contenedor {
+        width: 94%;
+
+        margin-top: 25px;
+    }
+
+    .formulario-acreditacion {
+        grid-template-columns: 1fr;
+    }
+
+    .formulario-acreditacion .campo-completo {
+        grid-column: auto;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE CELULAR
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .acreditacion-contenedor {
+        width: 96%;
+
+        margin: 15px auto 30px;
+    }
+
+    .acreditacion-panel {
+        padding: 20px 16px;
+
+        border-radius: 10px;
+    }
+
+    .acreditacion-cabecera h1 {
+        font-size: 27px;
+    }
+
+    .busqueda-dni {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .busqueda-dni .boton {
+        width: 100%;
+    }
+
+    .campo input,
+    .campo select {
+        height: 48px;
+
+        font-size: 16px;
+    }
+
+    .campo-dni input {
+        height: 52px;
+
+        font-size: 18px;
+    }
+
+    .opciones-radio {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+
+        padding: 5px 0;
+    }
+
+    .precio {
+        font-size: 27px;
+    }
+
+    .acciones-acreditacion {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .acciones-acreditacion .boton,
+    .boton-acreditar {
+        width: 100%;
+
+        min-height: 50px;
+    }
+
+}

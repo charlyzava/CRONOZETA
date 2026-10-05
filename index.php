@@ -22,20 +22,7 @@ $distancias = $stmt->fetchAll();
 
 <body>
 
-    <header class="navbar">
-
-        <div class="logo">
-            CronoTrail
-        </div>
-
-        <nav>
-            <a href="index.php">Inicio</a>
-            <a href="#">Corredores</a>
-            <a href="#">Cronometraje</a>
-            <a href="#">Clasificaciones</a>
-        </nav>
-
-    </header>
+    <?php require_once "includes/menu.php"; ?>
 
 
     <main>
