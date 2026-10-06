@@ -164,33 +164,7 @@ if (!$corredor) {
 <body>
 
 
-<header class="navbar">
-
-    <div class="logo">
-        CronoTrail
-    </div>
-
-
-    <nav>
-
-        <a href="../index.php">
-            Inicio
-        </a>
-
-        <a
-            href="index.php"
-            class="activo"
-        >
-            Corredores
-        </a>
-
-        <a href="../inscripciones/index.php">
-            Inscripciones
-        </a>
-
-    </nav>
-
-</header>
+<?php require_once "../includes/menu.php"; ?>
 
 
 

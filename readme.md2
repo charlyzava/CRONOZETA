@@ -1,0 +1,330 @@
+Perfecto. Con este dump ya tenemos **la estructura real completa** y podemos trabajar sobre ella sin adivinar nada.
+
+También veo algunos detalles que conviene corregir **antes de hacer el importador**.
+
+### 1. Los precios están efectivamente cargados como 30, 40, 50, 60
+
+Actualmente tenés:
+
+```text
+Período 1
+3K   30
+9K   40
+13K  50
+21K  60
+
+Período 2
+3K   40
+9K   50
+13K  60
+21K  70
+```
+
+Eso coincide con los importes que pusiste en el formulario **si estamos hablando de miles de pesos**, pero en la base deberían ser:
+
+```text
+30000
+40000
+50000
+60000
+```
+
+etc.
+
+Además, veo que tenés precios diferentes **con y sin remera**:
+
+```text
+Período 2 - 21K
+con remera:    70
+sin remera:    50
+```
+
+Esto es distinto de lo que habíamos interpretado inicialmente. Antes de corregirlo, necesito que me confirmes algo:
+
+**¿Querés realmente manejar precios diferentes con y sin remera?**
+
+Porque el Excel sí tiene:
+
+> Talle de Remera
+
+y por lo tanto tiene sentido que el sistema tenga esos dos precios.
+
+---
+
+### 2. También hay que corregir la inscripción de prueba
+
+Actualmente:
+
+```text
+inscripción 5
+13K
+precio_base = 60
+total = 60
+```
+
+Pero para el período 2 y 13K, según tu tabla, debería ser:
+
+```text
+$60.000 con remera
+```
+
+Así que si confirmamos que los precios son en pesos completos, esa inscripción debería quedar:
+
+```text
+precio_base = 60000
+total       = 60000
+```
+
+Y el pago de prueba:
+
+```text
+monto = 30
+```
+
+debería ser:
+
+```text
+monto = 30000
+```
+
+**No haría todavía esos `UPDATE`**, hasta que me confirmes lo de los precios con/sin remera.
+
+---
+
+## 3. Hay algo muy bueno en tu estructura
+
+Los rangos de dorsales ya están perfectamente configurados:
+
+| Distancia    | ID | Dorsales |
+| ------------ | -: | -------: |
+| 3K - Mayuato |  1 |     1–99 |
+| 9K - Liebre  |  2 |  101–199 |
+| 13K - Zorro  |  3 |  201–299 |
+| 21K - Cóndor |  4 |  301–399 |
+
+Por lo tanto el importador puede buscar automáticamente el siguiente dorsal disponible.
+
+Por ejemplo, actualmente:
+
+```text
+13K
+201 → ocupado
+```
+
+entonces el siguiente corredor de 13K recibe:
+
+```text
+202
+```
+
+No necesitamos poner los dorsales en el Excel.
+
+---
+
+## 4. Períodos
+
+También está bien:
+
+### Período 1
+
+```text
+01/01/2026 → 30/09/2026
+```
+
+### Período 2
+
+```text
+01/10/2026 → 08/11/2026
+```
+
+Esto nos permite utilizar la **Marca temporal del Excel** para determinar automáticamente qué período corresponde.
+
+Por ejemplo:
+
+```text
+15/09/2026 → período 1
+03/10/2026 → período 2
+```
+
+Me parece la mejor solución.
+
+---
+
+## 5. Categorías
+
+Actualmente solamente existe:
+
+```text
+M 40-49
+```
+
+No hay problema.
+
+El importador podrá hacer:
+
+```text
+Sexo + fecha de nacimiento
+        ↓
+buscar categoría
+        ↓
+encontrada → asignar
+no encontrada → informar error
+```
+
+**No voy a hacer que el sistema elija una categoría incorrecta por defecto.**
+
+Por ejemplo, si importamos una mujer de 35 años y todavía no existe su categoría, la vista previa debería decir:
+
+> ⚠️ Categoría no encontrada
+
+y podremos decidir qué hacer con ella.
+
+---
+
+## 6. Sobre los corredores repetidos
+
+Ahora entendí mejor lo que querés.
+
+La regla será:
+
+> **Un DNI sólo puede generar una inscripción para el evento.**
+
+Por lo tanto, si el Excel contiene:
+
+```text
+28945594 | Carlos Zavaleta | ...
+28945594 | Carlos Zavaleta | ...
+```
+
+no vamos a crear dos inscripciones.
+
+Primero buscamos:
+
+```sql
+WHERE dni = '28945594'
+```
+
+y si ya existe una inscripción para:
+
+```text
+evento_id = 1
+corredor_id = ...
+```
+
+**no se crea otra.**
+
+Esto es particularmente importante porque tu tabla `inscripciones` actualmente **no tiene un índice UNIQUE que impida dos inscripciones del mismo corredor en el mismo evento**.
+
+Yo no agregaría todavía ese índice porque estamos desarrollando y puede haber casos especiales que después quieras permitir. El importador lo controlará por código.
+
+---
+
+## 7. Pero queda una situación diferente
+
+Tenemos que distinguir:
+
+### Caso A — dos filas del Excel con el mismo DNI
+
+```text
+DNI       Distancia
+12345678  13K
+12345678  13K
+```
+
+→ **una sola inscripción.**
+
+Perfecto.
+
+### Caso B — una fila tiene dos distancias marcadas
+
+```text
+DNI       9K    13K
+12345678  X     X
+```
+
+Ahí necesitamos decidir qué hacer.
+
+Yo **no elegiría automáticamente una distancia**, porque podríamos inscribir accidentalmente a alguien en una carrera que no corresponde.
+
+Mi propuesta sería que la importación muestre:
+
+> ⚠️ DNI 12345678 tiene más de una distancia seleccionada.
+
+y no permita importarlo hasta corregirlo.
+
+---
+
+# Entonces el importador quedaría así
+
+```text
+                     EXCEL
+                       │
+                       ▼
+                Leer registros
+                       │
+                       ▼
+                 Validar DNI
+                       │
+              ┌────────┴────────┐
+              │                 │
+          DNI nuevo        DNI existente
+              │                 │
+              ▼                 │
+       Crear corredor            │
+              │                 │
+              └────────┬────────┘
+                       ▼
+              ¿Ya está inscripto?
+                 │           │
+                NO           SÍ
+                 │           │
+                 ▼           ▼
+          Procesar             No duplicar
+          inscripción
+                 │
+                 ▼
+        Determinar distancia
+                 │
+                 ▼
+        Determinar período
+        usando timestamp
+                 │
+                 ▼
+        Buscar precio
+                 │
+                 ▼
+        Buscar categoría
+                 │
+                 ▼
+        Asignar próximo dorsal
+                 │
+                 ▼
+          Crear inscripción
+```
+
+Y **no toca `pagos`**.
+
+---
+
+## Una recomendación adicional
+
+Antes de hacer el importador, corregiría los precios de la base. Pero primero necesito tu confirmación sobre esta cuestión:
+
+**¿Los precios sin remera son realmente diferentes?**
+
+Es decir, ¿querés mantener esto?
+
+| Distancia     | Con remera | Sin remera |
+| ------------- | ---------: | ---------: |
+| 3K período 1  |    $30.000 |    $30.000 |
+| 9K período 1  |    $40.000 |    $30.000 |
+| 13K período 1 |    $50.000 |    $40.000 |
+| 21K período 1 |    $60.000 |    $50.000 |
+| 3K período 2  |    $40.000 |    $30.000 |
+| 9K período 2  |    $50.000 |    $30.000 |
+| 13K período 2 |    $60.000 |    $40.000 |
+| 21K período 2 |    $70.000 |    $50.000 |
+
+**¿O el precio que figura en el formulario ($30.000, $40.000, $50.000, $60.000 / $40.000, $50.000, $60.000, $70.000) es el mismo con o sin remera?**
+
+Con esa confirmación podemos corregir la tabla y después sí te preparo el **importador Excel completo**, incluyendo la pantalla de vista previa para que podamos detectar duplicados, distancias múltiples y categorías faltantes antes de modificar la base.
