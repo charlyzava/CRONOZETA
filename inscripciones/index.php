@@ -272,7 +272,7 @@ try {
 
 
         <a
-            href="acreditacion.php"
+            href="inscripcion.php"
             class="btn-nuevo"
         >
             + Nueva inscripción

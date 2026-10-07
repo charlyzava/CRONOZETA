@@ -30,10 +30,6 @@
             Clasificaciones
         </a>
 
-        <a href="/configuracion/categorias.php">
-            Categorías
-        </a>
-
     </nav>
 
 </header>

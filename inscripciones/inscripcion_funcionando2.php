@@ -1,3 +1,4 @@
+
 <?php
 
 // =========================================================
@@ -8,6 +9,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 
+// Mostrar errores fatales que ocurran antes de que termine el script
 register_shutdown_function(function () {
 
     $error = error_get_last();
@@ -36,18 +38,10 @@ register_shutdown_function(function () {
             echo '<h2>ERROR FATAL DE PHP</h2>';
 
             echo '<strong>Mensaje:</strong><br>';
-            echo htmlspecialchars(
-                $error['message'],
-                ENT_QUOTES,
-                'UTF-8'
-            );
+            echo htmlspecialchars($error['message'], ENT_QUOTES, 'UTF-8');
 
             echo '<br><br><strong>Archivo:</strong><br>';
-            echo htmlspecialchars(
-                $error['file'],
-                ENT_QUOTES,
-                'UTF-8'
-            );
+            echo htmlspecialchars($error['file'], ENT_QUOTES, 'UTF-8');
 
             echo '<br><br><strong>Línea:</strong> ';
             echo (int)$error['line'];
@@ -79,16 +73,14 @@ try {
         ">
         <h2>Error cargando database.php</h2>
         <strong>' .
-        htmlspecialchars(
-            $ex->getMessage(),
-            ENT_QUOTES,
-            'UTF-8'
-        )
+        htmlspecialchars($ex->getMessage(), ENT_QUOTES, 'UTF-8')
         . '</strong>
         </div>
     ');
 }
 
+
+// Verificar PDO
 
 if (!isset($pdo)) {
 
@@ -102,10 +94,7 @@ if (!isset($pdo)) {
             border-radius:8px;
         ">
         <h2>Error de conexión</h2>
-        <p>
-            El archivo database.php no creó
-            la variable <strong>$pdo</strong>.
-        </p>
+        <p>El archivo database.php no creó la variable <strong>$pdo</strong>.</p>
         </div>
     ');
 }
@@ -123,14 +112,11 @@ $error = "";
 $corredor = null;
 $ya_inscripto = null;
 
-$evento = null;
 $distancias = [];
 $categorias = [];
 $precios_js = [];
 
 $corredor_id = 0;
-
-$edad_evento = null;
 
 
 // =========================================================
@@ -147,87 +133,13 @@ function e($valor)
 }
 
 
-/**
- * Calcula la edad de una persona
- * en una fecha determinada.
- */
-function calcularEdad($fecha_nacimiento, $fecha_evento)
-{
-    if (
-        empty($fecha_nacimiento) ||
-        empty($fecha_evento)
-    ) {
-        return null;
-    }
-
-    try {
-
-        $nacimiento =
-            new DateTime($fecha_nacimiento);
-
-        $evento =
-            new DateTime($fecha_evento);
-
-        if ($nacimiento > $evento) {
-            return null;
-        }
-
-        return $nacimiento
-            ->diff($evento)
-            ->y;
-
-    } catch (Throwable $ex) {
-
-        return null;
-    }
-}
-
-
-// =========================================================
-// CARGAR EVENTO
-// =========================================================
-
-try {
-
-    $stmt = $pdo->prepare(
-        "SELECT *
-         FROM eventos
-         WHERE id = ?
-         LIMIT 1"
-    );
-
-    $stmt->execute([
-        $evento_id
-    ]);
-
-    $evento =
-        $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$evento) {
-
-        $error =
-            "No existe el evento seleccionado.";
-    }
-
-} catch (Throwable $ex) {
-
-    $error =
-        "ERROR CARGANDO EVENTO: "
-        . $ex->getMessage();
-}
-
-
 // =========================================================
 // BUSCAR CORREDOR POR DNI
 // =========================================================
 
-if (
-    isset($_GET["dni"]) &&
-    $error === ""
-) {
+if (isset($_GET["dni"])) {
 
-    $dni =
-        trim($_GET["dni"]);
+    $dni = trim($_GET["dni"]);
 
     if ($dni !== "") {
 
@@ -240,34 +152,15 @@ if (
                  LIMIT 1"
             );
 
-            $stmt->execute([
-                $dni
-            ]);
+            $stmt->execute([$dni]);
 
-            $corredor =
-                $stmt->fetch(PDO::FETCH_ASSOC);
+            $corredor = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
             if ($corredor) {
 
-                $corredor_id =
-                    (int)$corredor["id"];
+                $corredor_id = (int)$corredor["id"];
 
-
-                // -----------------------------------------
-                // EDAD AL DÍA DEL EVENTO
-                // -----------------------------------------
-
-                $edad_evento =
-                    calcularEdad(
-                        $corredor["fecha_nacimiento"],
-                        $evento["fecha"]
-                    );
-
-
-                // -----------------------------------------
-                // VERIFICAR INSCRIPCIÓN EXISTENTE
-                // -----------------------------------------
 
                 $stmt = $pdo->prepare(
                     "SELECT
@@ -279,18 +172,14 @@ if (
                         i.categoria_id,
                         c.nombre AS categoria_nombre,
                         i.estado
-                     FROM inscripciones i
-
-                     INNER JOIN distancias d
-                         ON d.id = i.distancia_id
-
-                     LEFT JOIN categorias c
-                         ON c.id = i.categoria_id
-
-                     WHERE i.evento_id = ?
-                     AND i.corredor_id = ?
-
-                     LIMIT 1"
+                    FROM inscripciones i
+                    INNER JOIN distancias d
+                        ON d.id = i.distancia_id
+                    LEFT JOIN categorias c
+                        ON c.id = i.categoria_id
+                    WHERE i.evento_id = ?
+                    AND i.corredor_id = ?
+                    LIMIT 1"
                 );
 
                 $stmt->execute([
@@ -299,8 +188,7 @@ if (
                 ]);
 
                 $ya_inscripto =
-                    $stmt->fetch(PDO::FETCH_ASSOC)
-                    ?: false;
+                    $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
             }
 
         } catch (Throwable $ex) {
@@ -317,21 +205,15 @@ if (
 // GUARDAR INSCRIPCIÓN
 // =========================================================
 
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST"
-) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     try {
 
         $corredor_id =
-            (int)(
-                $_POST["corredor_id"] ?? 0
-            );
+            (int)($_POST["corredor_id"] ?? 0);
 
         $distancia_id =
-            (int)(
-                $_POST["distancia_id"] ?? 0
-            );
+            (int)($_POST["distancia_id"] ?? 0);
 
         $categoria_id =
             !empty($_POST["categoria_id"])
@@ -344,9 +226,7 @@ if (
             : 1;
 
         $talle_remera =
-            trim(
-                $_POST["talle_remera"] ?? ""
-            );
+            trim($_POST["talle_remera"] ?? "");
 
         $dorsal_ingresado =
             !empty($_POST["dorsal"])
@@ -356,61 +236,46 @@ if (
         $descuento_monto =
             max(
                 0,
-                (float)(
-                    $_POST["descuento_monto"] ?? 0
-                )
+                (float)($_POST["descuento_monto"] ?? 0)
             );
 
         $descuento_motivo =
-            trim(
-                $_POST["descuento_motivo"] ?? ""
-            );
+            trim($_POST["descuento_motivo"] ?? "");
 
         $pago_inicial =
             max(
                 0,
-                (float)(
-                    $_POST["pago_inicial"] ?? 0
-                )
+                (float)($_POST["pago_inicial"] ?? 0)
             );
 
         $medio_pago =
-            trim(
-                $_POST["medio_pago"] ?? ""
-            );
+            trim($_POST["medio_pago"] ?? "");
 
         $comprobante =
-            trim(
-                $_POST["comprobante"] ?? ""
-            );
+            trim($_POST["comprobante"] ?? "");
 
         $observacion_pago =
-            trim(
-                $_POST["observacion_pago"] ?? ""
-            );
+            trim($_POST["observacion_pago"] ?? "");
 
 
         // -----------------------------------------------------
-        // VALIDACIONES BÁSICAS
+        // VALIDACIONES
         // -----------------------------------------------------
 
         if ($corredor_id <= 0) {
 
-            $error =
-                "Corredor inválido.";
+            $error = "Corredor inválido.";
 
         } elseif ($distancia_id <= 0) {
 
-            $error =
-                "Debe seleccionar una distancia.";
+            $error = "Debe seleccionar una distancia.";
 
         } elseif (
             $remera === 1 &&
             $talle_remera === ""
         ) {
 
-            $error =
-                "Debe seleccionar el talle de remera.";
+            $error = "Debe seleccionar el talle de remera.";
 
         } elseif ($remera === 0) {
 
@@ -431,9 +296,7 @@ if (
                  LIMIT 1"
             );
 
-            $stmt->execute([
-                $corredor_id
-            ]);
+            $stmt->execute([$corredor_id]);
 
             $corredor =
                 $stmt->fetch(PDO::FETCH_ASSOC);
@@ -442,14 +305,6 @@ if (
 
                 $error =
                     "El corredor no existe.";
-
-            } else {
-
-                $edad_evento =
-                    calcularEdad(
-                        $corredor["fecha_nacimiento"],
-                        $evento["fecha"]
-                    );
             }
         }
 
@@ -489,8 +344,7 @@ if (
 
         if ($error === "") {
 
-            $fecha_hoy =
-                date("Y-m-d");
+            $fecha_hoy = date("Y-m-d");
 
             $stmt = $pdo->prepare(
                 "SELECT *
@@ -534,9 +388,7 @@ if (
                  LIMIT 1"
             );
 
-            $stmt->execute([
-                $distancia_id
-            ]);
+            $stmt->execute([$distancia_id]);
 
             $distancia =
                 $stmt->fetch(PDO::FETCH_ASSOC);
@@ -554,126 +406,6 @@ if (
 
                 $error =
                     "La distancia no tiene configurado el rango de dorsales.";
-            }
-        }
-
-
-        // -----------------------------------------------------
-        // VALIDAR CATEGORÍA
-        // -----------------------------------------------------
-
-        if (
-            $error === "" &&
-            $categoria_id !== null
-        ) {
-
-            /*
-             * La categoría debe:
-             *
-             * 1. pertenecer al evento
-             * 2. estar asociada a la distancia
-             * 3. coincidir con el sexo
-             * 4. coincidir con la edad si conocemos la edad
-             */
-
-            $stmt = $pdo->prepare(
-                "SELECT
-                    c.*
-                 FROM categorias c
-
-                 INNER JOIN categoria_distancia cd
-                     ON cd.categoria_id = c.id
-
-                 WHERE c.id = ?
-                 AND c.evento_id = ?
-                 AND cd.distancia_id = ?
-
-                 LIMIT 1"
-            );
-
-            $stmt->execute([
-                $categoria_id,
-                $evento_id,
-                $distancia_id
-            ]);
-
-            $categoria =
-                $stmt->fetch(PDO::FETCH_ASSOC);
-
-
-            if (!$categoria) {
-
-                $error =
-                    "La categoría seleccionada no corresponde a la distancia elegida.";
-
-            } else {
-
-                // ---------------------------------------------
-                // SEXO
-                // ---------------------------------------------
-
-                $sexo_corredor =
-                    strtoupper(
-                        trim(
-                            $corredor["sexo"] ?? ""
-                        )
-                    );
-
-                $sexo_categoria =
-                    strtoupper(
-                        trim(
-                            $categoria["sexo"] ?? ""
-                        )
-                    );
-
-
-                if (
-                    $sexo_categoria !== "" &&
-                    $sexo_corredor !== "" &&
-                    $sexo_categoria !==
-                    $sexo_corredor
-                ) {
-
-                    $error =
-                        "La categoría seleccionada no corresponde al sexo del corredor.";
-                }
-
-
-                // ---------------------------------------------
-                // EDAD
-                // ---------------------------------------------
-
-                if (
-                    $error === "" &&
-                    $edad_evento !== null
-                ) {
-
-                    $edad_min =
-                        $categoria["edad_min"];
-
-                    $edad_max =
-                        $categoria["edad_max"];
-
-
-                    if (
-                        $edad_min !== null &&
-                        $edad_evento <
-                        (int)$edad_min
-                    ) {
-
-                        $error =
-                            "La categoría seleccionada no corresponde a la edad del corredor.";
-
-                    } elseif (
-                        $edad_max !== null &&
-                        $edad_evento >
-                        (int)$edad_max
-                    ) {
-
-                        $error =
-                            "La categoría seleccionada no corresponde a la edad del corredor.";
-                    }
-                }
             }
         }
 
@@ -717,10 +449,7 @@ if (
                     : (float)$precio["precio_sin_remera"];
 
 
-                if (
-                    $descuento_monto >
-                    $precio_base
-                ) {
+                if ($descuento_monto > $precio_base) {
 
                     $descuento_monto =
                         $precio_base;
@@ -752,8 +481,7 @@ if (
                 $hasta =
                     (int)$distancia["dorsal_hasta"];
 
-                $dorsal_encontrado =
-                    null;
+                $dorsal_encontrado = null;
 
 
                 for (
@@ -786,9 +514,7 @@ if (
                 }
 
 
-                if (
-                    $dorsal_encontrado === null
-                ) {
+                if ($dorsal_encontrado === null) {
 
                     $error =
                         "No quedan dorsales disponibles para la distancia seleccionada.";
@@ -878,9 +604,6 @@ if (
 
         if ($error === "") {
 
-            $pdo->beginTransaction();
-
-
             $stmt = $pdo->prepare(
                 "INSERT INTO inscripciones
                 (
@@ -904,6 +627,9 @@ if (
                     ?, ?, ?, ?, 'confirmado'
                 )"
             );
+
+
+            $pdo->beginTransaction();
 
 
             $stmt->execute([
@@ -995,8 +721,8 @@ if (
 
 
         $error =
-            "ERROR PHP/SQL: "
-            . $ex->getMessage();
+            "ERROR PHP/SQL: " .
+            $ex->getMessage();
     }
 }
 
@@ -1007,9 +733,7 @@ if (
 
 try {
 
-    // ---------------------------------------------------------
     // DISTANCIAS
-    // ---------------------------------------------------------
 
     $stmt = $pdo->query(
         "SELECT *
@@ -1021,46 +745,22 @@ try {
         $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-    // ---------------------------------------------------------
     // CATEGORÍAS
-    //
-    // Traemos únicamente las categorías del evento
-    // y las relaciones con las distancias.
-    // ---------------------------------------------------------
 
     $stmt = $pdo->prepare(
-        "SELECT
-            c.id,
-            c.evento_id,
-            c.nombre,
-            c.sexo,
-            c.edad_min,
-            c.edad_max,
-            cd.distancia_id
-         FROM categorias c
-
-         INNER JOIN categoria_distancia cd
-             ON cd.categoria_id = c.id
-
-         WHERE c.evento_id = ?
-
-         ORDER BY
-            c.sexo,
-            c.edad_min,
-            c.edad_max"
+        "SELECT *
+         FROM categorias
+         WHERE evento_id = ?
+         ORDER BY sexo, edad_min"
     );
 
-    $stmt->execute([
-        $evento_id
-    ]);
+    $stmt->execute([$evento_id]);
 
     $categorias =
         $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-    // ---------------------------------------------------------
     // PRECIOS
-    // ---------------------------------------------------------
 
     $fecha_hoy =
         date("Y-m-d");
@@ -1071,14 +771,10 @@ try {
             pi.distancia_id,
             pi.precio_con_remera,
             pi.precio_sin_remera
-
          FROM precios_inscripcion pi
-
          INNER JOIN periodos_inscripcion p
              ON p.id = pi.periodo_id
-
          WHERE p.evento_id = ?
-
          AND p.fecha_desde <= ?
          AND p.fecha_hasta >= ?"
     );
@@ -1263,47 +959,6 @@ button,
     font-family: monospace;
 }
 
-.info-corredor {
-    display: grid;
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.dato {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.dato strong {
-    display: block;
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.categoria-info {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #666;
-}
-
-.categoria-sugerida {
-    color: #176b2c;
-    font-weight: bold;
-}
-
-@media (max-width: 700px) {
-
-    .info-corredor {
-        grid-template-columns: 1fr;
-    }
-
-}
-
 </style>
 
 </head>
@@ -1343,38 +998,6 @@ Dorsal asignado:
 <strong>
 <?= e($_GET["dorsal"] ?? "") ?>
 </strong>
-
-</div>
-
-<?php endif; ?>
-
-
-<?php if ($evento): ?>
-
-<div class="info">
-
-<strong>
-<?= e($evento["nombre"]) ?>
-</strong>
-
-<br>
-
-Fecha:
-<?= e(
-    date(
-        "d/m/Y",
-        strtotime($evento["fecha"])
-    )
-) ?>
-
-<?php if (!empty($evento["lugar"])): ?>
-
-<br>
-
-Lugar:
-<?= e($evento["lugar"]) ?>
-
-<?php endif; ?>
 
 </div>
 
@@ -1429,57 +1052,6 @@ Buscar corredor
 
 DNI:
 <?= e($corredor["dni"]) ?>
-
-
-<div class="info-corredor">
-
-<div class="dato">
-
-<strong>Sexo</strong>
-
-<?= e(
-    $corredor["sexo"] ?: "No informado"
-) ?>
-
-</div>
-
-
-<div class="dato">
-
-<strong>Fecha de nacimiento</strong>
-
-<?= !empty($corredor["fecha_nacimiento"])
-    ? e(
-        date(
-            "d/m/Y",
-            strtotime(
-                $corredor["fecha_nacimiento"]
-            )
-        )
-    )
-    : "No informada"
-?>
-
-</div>
-
-
-<div class="dato">
-
-<strong>Edad al día de la carrera</strong>
-
-<?php if ($edad_evento !== null): ?>
-
-<?= e($edad_evento) ?> años
-
-<?php else: ?>
-
-No disponible
-
-<?php endif; ?>
-
-</div>
-
-</div>
 
 
 <?php if (!empty($corredor["email"])): ?>
@@ -1548,10 +1120,6 @@ Ir a acreditación
 >
 
 
-<!-- =====================================================
-     DISTANCIA
-===================================================== -->
-
 <div class="campo">
 
 <label>Distancia</label>
@@ -1567,14 +1135,9 @@ Seleccionar distancia
 </option>
 
 
-<?php foreach (
-    $distancias
-    as $distancia
-): ?>
+<?php foreach ($distancias as $distancia): ?>
 
-<option
-    value="<?= e($distancia["id"]) ?>"
->
+<option value="<?= e($distancia["id"]) ?>">
 
 <?= e($distancia["nombre"]) ?>
 
@@ -1598,10 +1161,6 @@ km
 
 </div>
 
-
-<!-- =====================================================
-     REMERA
-===================================================== -->
 
 <div class="campo">
 
@@ -1640,10 +1199,6 @@ Sin remera
 </div>
 
 
-<!-- =====================================================
-     TALLE
-===================================================== -->
-
 <div
     class="campo"
     id="campo_talle"
@@ -1672,39 +1227,31 @@ Seleccionar talle
 </div>
 
 
-<!-- =====================================================
-     CATEGORÍA
-===================================================== -->
-
 <div class="campo">
 
 <label>Categoría</label>
 
-<select
-    name="categoria_id"
-    id="categoria_id"
->
+<select name="categoria_id">
 
 <option value="">
 Seleccionar categoría
 </option>
 
+
+<?php foreach ($categorias as $categoria): ?>
+
+<option value="<?= e($categoria["id"]) ?>">
+
+<?= e($categoria["nombre"]) ?>
+
+</option>
+
+<?php endforeach; ?>
+
 </select>
 
-
-<div
-    id="categoria_info"
-    class="categoria-info"
->
-Seleccione una distancia.
 </div>
 
-</div>
-
-
-<!-- =====================================================
-     DORSAL
-===================================================== -->
 
 <div class="campo">
 
@@ -1726,10 +1273,6 @@ se asignará el primer dorsal libre del rango.
 
 </div>
 
-
-<!-- =====================================================
-     DESCUENTO
-===================================================== -->
 
 <div class="campo">
 
@@ -1759,10 +1302,6 @@ se asignará el primer dorsal libre del rango.
 
 </div>
 
-
-<!-- =====================================================
-     PAGO
-===================================================== -->
 
 <h3>Pago inicial (opcional)</h3>
 
@@ -1831,10 +1370,6 @@ se asignará el primer dorsal libre del rango.
 </div>
 
 
-<!-- =====================================================
-     TOTAL
-===================================================== -->
-
 <div class="campo">
 
 <label>Total</label>
@@ -1868,41 +1403,15 @@ Confirmar inscripción
 
 <script>
 
-// =========================================================
-// DATOS PHP
-// =========================================================
-
 const precios =
 <?= json_encode($precios_js) ?>;
 
 const distancias =
 <?= json_encode($distancias) ?>;
 
-const categorias =
-<?= json_encode($categorias) ?>;
 
-const sexoCorredor =
-<?= json_encode(
-    strtoupper(
-        trim(
-            $corredor["sexo"] ?? ""
-        )
-    )
-) ?>;
+function formatoMoneda(valor) {
 
-const edadCorredor =
-<?= $edad_evento !== null
-    ? (int)$edad_evento
-    : 'null'
-?>;
-
-
-// =========================================================
-// FORMATO MONEDA
-// =========================================================
-
-function formatoMoneda(valor)
-{
     return new Intl.NumberFormat(
         'es-AR',
         {
@@ -1911,265 +1420,12 @@ function formatoMoneda(valor)
             minimumFractionDigits: 2
         }
     ).format(valor);
+
 }
 
 
-// =========================================================
-// ACTUALIZAR CATEGORÍAS
-// =========================================================
+function actualizar() {
 
-function actualizarCategorias()
-{
-    const selectDistancia =
-        document.getElementById(
-            'distancia_id'
-        );
-
-    const selectCategoria =
-        document.getElementById(
-            'categoria_id'
-        );
-
-    const info =
-        document.getElementById(
-            'categoria_info'
-        );
-
-
-    if (
-        !selectDistancia ||
-        !selectCategoria
-    ) {
-        return;
-    }
-
-
-    const distanciaId =
-        parseInt(
-            selectDistancia.value
-        );
-
-
-    selectCategoria.innerHTML =
-        '<option value="">Seleccionar categoría</option>';
-
-
-    if (!distanciaId) {
-
-        info.textContent =
-            'Seleccione una distancia.';
-
-        return;
-    }
-
-
-    // -----------------------------------------------------
-    // FILTRAR CATEGORÍAS
-    // -----------------------------------------------------
-
-    const disponibles =
-        categorias.filter(
-            function(categoria)
-            {
-
-                const correspondeDistancia =
-                    parseInt(
-                        categoria.distancia_id
-                    ) === distanciaId;
-
-
-                if (!correspondeDistancia) {
-                    return false;
-                }
-
-
-                const sexoCategoria =
-                    (
-                        categoria.sexo || ''
-                    ).toUpperCase();
-
-
-                // Categoría sin sexo =
-                // válida para ambos.
-
-                if (
-                    sexoCategoria !== '' &&
-                    sexoCorredor !== '' &&
-                    sexoCategoria !==
-                    sexoCorredor
-                ) {
-
-                    return false;
-                }
-
-
-                return true;
-            }
-        );
-
-
-    // -----------------------------------------------------
-    // CREAR OPCIONES
-    // -----------------------------------------------------
-
-    disponibles.forEach(
-        function(categoria)
-        {
-
-            let texto =
-                categoria.nombre;
-
-
-            if (
-                categoria.edad_min !== null ||
-                categoria.edad_max !== null
-            ) {
-
-                let rango = '';
-
-
-                if (
-                    categoria.edad_min !== null
-                ) {
-
-                    rango +=
-                        categoria.edad_min;
-                }
-
-
-                rango += ' - ';
-
-
-                if (
-                    categoria.edad_max !== null
-                ) {
-
-                    rango +=
-                        categoria.edad_max;
-                }
-
-
-                texto +=
-                    ' (' + rango + ' años)';
-            }
-
-
-            if (
-                categoria.sexo === 'M'
-            ) {
-
-                texto +=
-                    ' - Masculino';
-
-            } else if (
-                categoria.sexo === 'F'
-            ) {
-
-                texto +=
-                    ' - Femenino';
-            }
-
-
-            const option =
-                document.createElement(
-                    'option'
-                );
-
-
-            option.value =
-                categoria.id;
-
-            option.textContent =
-                texto;
-
-
-            selectCategoria.appendChild(
-                option
-            );
-        }
-    );
-
-
-    // -----------------------------------------------------
-    // BUSCAR CATEGORÍA AUTOMÁTICA
-    // -----------------------------------------------------
-
-    let sugerida = null;
-
-
-    if (edadCorredor !== null) {
-
-        sugerida =
-            disponibles.find(
-                function(categoria)
-                {
-
-                    const min =
-                        categoria.edad_min !== null
-                        ? parseInt(
-                            categoria.edad_min
-                        )
-                        : 0;
-
-
-                    const max =
-                        categoria.edad_max !== null
-                        ? parseInt(
-                            categoria.edad_max
-                        )
-                        : 999;
-
-
-                    return (
-                        edadCorredor >= min &&
-                        edadCorredor <= max
-                    );
-                }
-            );
-    }
-
-
-    if (sugerida) {
-
-        selectCategoria.value =
-            sugerida.id;
-
-
-        info.innerHTML =
-            '<span class="categoria-sugerida">' +
-            'Categoría sugerida automáticamente: ' +
-            sugerida.nombre +
-            '</span>';
-
-    } else {
-
-        if (disponibles.length === 0) {
-
-            info.textContent =
-                'No hay categorías disponibles para esta distancia y sexo.';
-
-        } else if (
-            edadCorredor === null
-        ) {
-
-            info.textContent =
-                'No se puede determinar automáticamente la categoría porque falta la fecha de nacimiento.';
-
-        } else {
-
-            info.textContent =
-                'No se encontró una categoría compatible con la edad del corredor. Seleccione una manualmente.';
-        }
-    }
-}
-
-
-// =========================================================
-// ACTUALIZAR TODO
-// =========================================================
-
-function actualizar()
-{
     const select =
         document.getElementById(
             'distancia_id'
@@ -2218,10 +1474,6 @@ function actualizar()
         : '';
 
 
-    // -----------------------------------------------------
-    // TALLE
-    // -----------------------------------------------------
-
     const talle =
         document.getElementById(
             'talle_remera'
@@ -2238,28 +1490,20 @@ function actualizar()
         rem.value === '1'
     ) {
 
-        campo.style.display =
-            'block';
+        campo.style.display = 'block';
 
-        talle.disabled =
-            false;
+        talle.disabled = false;
 
     } else {
 
-        campo.style.display =
-            'none';
+        campo.style.display = 'none';
 
-        talle.disabled =
-            true;
+        talle.disabled = true;
 
-        talle.value =
-            '';
+        talle.value = '';
+
     }
 
-
-    // -----------------------------------------------------
-    // PRECIO
-    // -----------------------------------------------------
 
     if (
         !precios[select.value] ||
@@ -2269,54 +1513,44 @@ function actualizar()
         precio.textContent =
             formatoMoneda(0);
 
-    } else {
-
-        let base =
-            parseFloat(
-                rem.value === '1'
-                ? precios[
-                    select.value
-                  ].con_remera
-                : precios[
-                    select.value
-                  ].sin_remera
-            );
-
-
-        let descuento =
-            parseFloat(
-                desc?.value || 0
-            );
-
-
-        let total =
-            Math.max(
-                0,
-                base - descuento
-            );
-
-
-        precio.textContent =
-            formatoMoneda(total);
+        return;
     }
 
 
-    // -----------------------------------------------------
-    // CATEGORÍAS
-    // -----------------------------------------------------
+    let base =
+        parseFloat(
+            rem.value === '1'
+            ? precios[
+                select.value
+              ].con_remera
+            : precios[
+                select.value
+              ].sin_remera
+        );
 
-    actualizarCategorias();
+
+    let descuento =
+        parseFloat(
+            desc?.value || 0
+        );
+
+
+    let total =
+        Math.max(
+            0,
+            base - descuento
+        );
+
+
+    precio.textContent =
+        formatoMoneda(total);
+
 }
 
 
-// =========================================================
-// EVENTOS
-// =========================================================
-
 document.addEventListener(
     'DOMContentLoaded',
-    function()
-    {
+    () => {
 
         document
             .getElementById(
@@ -2333,15 +1567,11 @@ document.addEventListener(
                 'input[name="remera"]'
             )
             .forEach(
-                function(x)
-                {
-
+                x =>
                     x.addEventListener(
                         'change',
                         actualizar
-                    );
-
-                }
+                    )
             );
 
 
@@ -2365,3 +1595,4 @@ document.addEventListener(
 </body>
 
 </html>
+
