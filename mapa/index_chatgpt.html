@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desafío Bella Vista</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#f4f1eb;--ink:#182018;--muted:#687067;--card:#fff;--line:#d9ddd7;--accent:#d66a25}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:22px 5vw;display:flex;justify-content:space-between;align-items:center;background:#fff;position:sticky;top:0;z-index:1000;border-bottom:1px solid var(--line)}
+.brand{font-weight:800;letter-spacing:.08em;text-transform:uppercase}nav a{margin-left:20px;color:var(--ink);text-decoration:none;font-size:14px}
+.hero{padding:76px 5vw 55px;display:grid;grid-template-columns:1.15fr .85fr;gap:45px;max-width:1400px;margin:auto}
+.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(44px,7vw,92px);line-height:.92;margin:16px 0}h2{font-size:34px;margin:0 0 12px}p{line-height:1.6;color:var(--muted)}
+.hero-card{background:#1d271e;color:#fff;border-radius:28px;padding:28px;min-height:320px;display:flex;flex-direction:column;justify-content:end}
+.hero-card p{color:#cfd7ce}.btn{display:inline-block;padding:13px 18px;border-radius:999px;background:var(--accent);color:white;text-decoration:none;font-weight:700;margin-top:12px}
+section{max-width:1400px;margin:auto;padding:45px 5vw}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat,.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px}.stat strong{font-size:30px;display:block}
+#map{height:620px;border-radius:24px;overflow:hidden;border:1px solid var(--line)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}button{border:1px solid var(--line);background:white;padding:10px 15px;border-radius:999px;cursor:pointer;font-weight:700}button.active{box-shadow:0 0 0 2px #222 inset}
+.routes{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.route-dot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:7px}
+.profile{height:180px;width:100%;background:#fafafa;border-radius:14px;border:1px solid var(--line);padding:10px}
+svg{width:100%;height:100%}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+footer{padding:35px 5vw;background:#182018;color:#dfe7dd;margin-top:40px}footer p{color:#b8c1b7}
+@media(max-width:850px){.hero{grid-template-columns:1fr}.stats,.routes,.feature-grid{grid-template-columns:1fr 1fr}nav{display:none}}
+@media(max-width:560px){.stats,.routes,.feature-grid{grid-template-columns:1fr}.hero{padding-top:45px}#map{height:500px}}
+</style>
+</head>
+<body>
+
+<header><div class="brand">Desafío Bella Vista</div><nav><a href="#recorridos">Recorridos</a><a href="#perfil">Perfiles</a><a href="#futuro">Plataforma</a></nav></header>
+<main>
+<section class="hero"><div><div class="eyebrow">Trail running · Catamarca</div><h1>El camino<br>es el desafío.</h1><p>Una plataforma propia para presentar recorridos, perfiles de elevación, puestos de apoyo y, en el futuro, crear nuevos eventos a partir de un archivo GPX.</p><a class="btn" href="#recorridos">Explorar recorridos</a></div>
+<div class="hero-card"><div class="eyebrow">Edición de muestra</div><h2>Desafío Bella Vista</h2><p>4 distancias · mapa interactivo · perfiles de elevación · puntos de control e hidratación.</p><a class="btn" href="#mapa">Ver mapa</a></div></section>
+<section><div class="stats" id="stats"></div></section>
+<section id="recorridos"><div class="eyebrow">Los recorridos</div><h2>Elegí tu distancia</h2><p>Activá o desactivá los recorridos para comparar sus trazados.</p><div class="routes" id="routeCards"></div><div class="controls" id="buttons"></div></section>
+<section id="mapa"><div id="map"></div></section>
+<section id="perfil"><div class="eyebrow">Altimetría</div><h2>Perfil de elevación</h2><div class="controls" id="profileButtons"></div><div class="card"><div class="profile" id="profileBox"></div></div></section>
+<section id="futuro"><div class="eyebrow">Arquitectura futura</div><h2>De un evento a una plataforma</h2><div class="feature-grid">
+<div class="card"><h3>Crear evento</h3><p>Nombre, fecha, ubicación, logo, categorías y recorridos.</p></div>
+<div class="card"><h3>Subir GPX</h3><p>El sistema analiza distancia, desnivel, altitudes y genera automáticamente el gráfico.</p></div>
+<div class="card"><h3>Mapa automático</h3><p>El recorrido aparece sobre el mapa con colores, puntos de interés y ficha técnica.</p></div>
+<div class="card"><h3>Compartir</h3><p>Cada recorrido puede tener su propia URL para corredores.</p></div>
+<div class="card"><h3>Panel organizador</h3><p>Editar hidrataciones, controles, categorías y datos del evento sin tocar código.</p></div>
+<div class="card"><h3>Escalable</h3><p>La misma base puede alojar Desafío Bella Vista y futuros eventos.</p></div>
+</div></section>
+</main><footer><strong>Desafío Bella Vista</strong><p>Mapa y datos de recorridos · © OpenStreetMap contributors</p></footer>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+
+const ROUTES = [
+  {id:'3k', name:'3K', color:'#1565C0', file:'desafio-bella-vista-3k.gpx'},
+  {id:'9k', name:'9K', color:'#2E7D32', file:'desafio-bella-vista-9k-extendido.gpx'},
+  {id:'13k', name:'13K', color:'#EF6C00', file:'desafio-bella-vista-13k.gpx'},
+  {id:'21k', name:'21K', color:'#C62828', file:'desafio-bella-vista-21k.gpx'}
+];
+
+const GPX_BASE = 'gpx/';
+const layers = {};
+const routeData = {};
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function haversine(a,b){
+  const R=6371000, p=Math.PI/180;
+  const dLat=(b.lat-a.lat)*p, dLon=(b.lon-a.lon)*p;
+  const x=Math.sin(dLat/2)**2 + Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+
+function parseGPX(xml){
+  const doc = new DOMParser().parseFromString(xml,'application/xml');
+  if(doc.querySelector('parsererror')) throw new Error('GPX inválido');
+  const nodes = [...doc.getElementsByTagNameNS('*','trkpt')];
+  if(!nodes.length) throw new Error('El GPX no contiene puntos de track');
+
+  const pts = nodes.map(n=>({
+    lat:Number(n.getAttribute('lat')),
+    lon:Number(n.getAttribute('lon')),
+    ele:(()=>{const e=n.getElementsByTagNameNS('*','ele')[0]; return e ? Number(e.textContent) : null})()
+  })).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+
+  let dist=0, gain=0, min=Infinity, max=-Infinity;
+  const profile=[];
+  for(let i=0;i<pts.length;i++){
+    if(i){
+      dist += haversine(pts[i-1],pts[i])/1000;
+      if(Number.isFinite(pts[i].ele) && Number.isFinite(pts[i-1].ele)){
+        const dz=pts[i].ele-pts[i-1].ele;
+        if(dz>0) gain+=dz;
+      }
+    }
+    if(Number.isFinite(pts[i].ele)){ min=Math.min(min,pts[i].ele); max=Math.max(max,pts[i].ele); }
+    profile.push({d:dist,e:pts[i].ele});
+  }
+  return {pts, distance_km:dist, gain_m:gain, min_m:min, max_m:max, profile};
+}
+
+function makeCards(){
+  const cards=document.getElementById('routeCards');
+  const buttons=document.getElementById('buttons');
+  const pb=document.getElementById('profileButtons');
+  cards.innerHTML=buttons.innerHTML=pb.innerHTML='';
+  ROUTES.forEach(r=>{
+    cards.insertAdjacentHTML('beforeend',`<div class="card"><h3><span class="route-dot" style="background:${r.color}"></span>${r.name}</h3><strong id="dist-${r.id}">Cargando…</strong><p id="meta-${r.id}">Leyendo GPX…</p></div>`);
+    buttons.insertAdjacentHTML('beforeend',`<button class="active" data-route="${r.id}"><span class="route-dot" style="background:${r.color}"></span>${r.name}</button>`);
+    pb.insertAdjacentHTML('beforeend',`<button data-profile="${r.id}">${r.name}</button>`);
+  });
+}
+
+function updateStats(){
+  document.getElementById('stats').innerHTML=ROUTES.map(r=>{
+    const d=routeData[r.id];
+    return `<div class="stat"><span>${r.name}</span><strong>${d.distance_km.toFixed(1)} km</strong><p>+${Math.round(d.gain_m)} m D+</p></div>`;
+  }).join('');
+  ROUTES.forEach(r=>{
+    const d=routeData[r.id];
+    document.getElementById('dist-'+r.id).textContent=d.distance_km.toFixed(2)+' km';
+    document.getElementById('meta-'+r.id).textContent=`+${Math.round(d.gain_m)} m D+ · máx. ${Math.round(d.max_m)} m`;
+  });
+}
+
+const map=L.map('map').setView([-28.17,-65.89],13);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19, attribution:'© OpenStreetMap contributors'
+}).addTo(map);
+
+async function loadRoutes(){
+  makeCards();
+  const errors=[];
+  for(const r of ROUTES){
+    try{
+      const response=await fetch(GPX_BASE+r.file,{cache:'no-cache'});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const xml=await response.text();
+      const data=parseGPX(xml);
+      routeData[r.id]=data;
+
+      layers[r.id]=L.polyline(
+        data.pts.map(p=>[p.lat,p.lon]),
+        {color:r.color,weight:5,opacity:.92,lineJoin:'round'}
+      ).addTo(map);
+    }catch(e){
+      errors.push(`${r.name}: ${e.message}`);
+      console.error('Error cargando',r.file,e);
+    }
+  }
+
+  if(Object.keys(layers).length){
+    const group=L.featureGroup(Object.values(layers));
+    map.fitBounds(group.getBounds().pad(.08));
+  }
+
+  if(Object.keys(routeData).length===ROUTES.length){
+    updateStats();
+    drawProfile('3k');
+  }
+
+  // Start/finish
+  L.marker([-28.17687,-65.8826]).addTo(map).bindPopup('<strong>Largada / Llegada</strong>');
+
+  // Support points
+  const points=[
+    {route:'9K',label:'9K · Control + retome + hidratación',lat:-28.148358790167205,lon:-65.8884987901672},
+    {route:'13K',label:'13K · Control',lat:-28.17384,lon:-65.90775},
+    {route:'13K',label:'13K · Hidratación km 1',lat:-28.180501962645117,lon:-65.88271604358069},
+    {route:'13K',label:'13K · Hidratación km 5',lat:-28.174282323260208,lon:-65.90403488217346}
+  ];
+  points.forEach(p=>L.circleMarker([p.lat,p.lon],{radius:7,weight:2,fillOpacity:.95}).addTo(map).bindPopup(`<strong>${esc(p.label)}</strong>`));
+
+  if(errors.length){
+    const msg=document.createElement('div');
+    msg.style='margin-top:12px;padding:12px;border-radius:12px;background:#fff3cd;border:1px solid #e0c36a';
+    msg.innerHTML='<strong>No se pudieron cargar algunos GPX:</strong><br>'+errors.map(esc).join('<br>');
+    document.getElementById('map').parentElement.appendChild(msg);
+  }
+}
+
+document.getElementById('buttons').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-route]');
+  if(!b) return;
+  const id=b.dataset.route;
+  const visible=!map.hasLayer(layers[id]);
+  if(visible) layers[id].addTo(map); else map.removeLayer(layers[id]);
+  b.classList.toggle('active',visible);
+});
+
+document.getElementById('profileButtons').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-profile]');
+  if(b) drawProfile(b.dataset.profile);
+});
+
+function drawProfile(id){
+  const d=routeData[id];
+  if(!d) return;
+  const pts=d.profile.filter(p=>Number.isFinite(p.e));
+  if(pts.length<2) return;
+  const box=document.getElementById('profileBox');
+  const W=900,H=160,pad=12;
+  const xs=pts.map(p=>p.d), ys=pts.map(p=>p.e);
+  const xmin=Math.min(...xs), xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const X=x=>pad+(x-xmin)/(xmax-xmin)*(W-2*pad);
+  const Y=y=>H-pad-(y-ymin)/Math.max(1,ymax-ymin)*(H-2*pad);
+  const line=pts.map(p=>`${X(p.d).toFixed(1)},${Y(p.e).toFixed(1)}`).join(' ');
+  const area=`${pad},${H-pad} ${line} ${W-pad},${H-pad}`;
+  const r=ROUTES.find(x=>x.id===id);
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <polygon points="${area}" fill="${r.color}" opacity=".15"></polygon>
+    <polyline points="${line}" fill="none" stroke="${r.color}" stroke-width="3"></polyline>
+    <text x="${pad}" y="14" font-size="12" fill="#687168">${Math.round(ymax)} m</text>
+    <text x="${pad}" y="${H-2}" font-size="12" fill="#687168">${xmin.toFixed(1)} km</text>
+    <text x="${W-pad-45}" y="${H-2}" font-size="12" fill="#687168">${xmax.toFixed(1)} km</text>
+  </svg>`;
+}
+
+loadRoutes();
+
+</script>
+</body>
+</html>

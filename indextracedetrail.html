@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Rutas de Trail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+        .route-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .route-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .route-iframe-container {
+            position: relative;
+            width: 100%;
+            height: 450px; /* Altura estándar para mostrar mapa y altimetría */
+        }
+        .route-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mis Rutas de Trail</h1>
+    <p style="text-align: center; color: #666;">Explora los mapas y perfiles de altimetría de nuestros recorridos.</p>
+
+    <div class="container">
+        
+        <!-- Ruta 1 -->
+        <div class="route-card">
+            <div class="route-header">Ruta 1: Nombre de tu Ruta</div>
+            <div class="route-iframe-container">
+                <!-- Reemplaza el enlace de ejemplo 'src' con el código iframe real de tu Ruta 1 -->
+                <iframe src="https://tracedetrail.fr/en/iframe/10780" allowfullscreen style="border: 0;width: 100%; height: 800px;" scrolling="no"></iframe>
+            </div>
+        </div>
+
+        <!-- Ruta 2 -->
+        <div class="route-card">
+            <div class="route-header">Ruta 2: Nombre de tu Ruta</div>
+            <div class="route-iframe-container">
+                <!-- Reemplaza el enlace de ejemplo 'src' con el código iframe real de tu Ruta 2 -->
+                 <iframe src="https://tracedetrail.fr/fr/iframe/10779" allowfullscreen style="border: 0;width: 100%; height: 800px;" scrolling="no"></iframe>
+                <!--<iframe src="https://www.tracedetrail.com/es/embed/trace/273793" scrolling="no" frameborder="0"></iframe>-->
+            </div>
+        </div>
+
+        <!-- Ruta 3 -->
+        <div class="route-card">
+            <div class="route-header">Ruta 3: Nombre de tu Ruta</div>
+            <div class="route-iframe-container">
+                <!-- Reemplaza el enlace de ejemplo 'src' con el código iframe real de tu Ruta 3 -->
+                <iframe src="https://www.tracedetrail.com/es/embed/trace/273750" scrolling="no" frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <!-- Ruta 4 -->
+        <div class="route-card">
+            <div class="route-header">Ruta 4: Nombre de tu Ruta</div>
+            <div class="route-iframe-container">
+                <!-- Reemplaza el enlace de ejemplo 'src' con el código iframe real de tu Ruta 4 -->
+                <iframe src="https://www.tracedetrail.com/es/embed/trace/347114" scrolling="no" frameborder="0"></iframe>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

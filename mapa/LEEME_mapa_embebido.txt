@@ -1,0 +1,12 @@
+DESAFÍO BELLA VISTA — versión robusta para InfinityFree
+
+1. Subir SOLO el archivo index.html de este paquete a la misma carpeta donde funciona tu index2.html.
+2. Podés dejar la carpeta gpx y sus archivos como están; esta versión NO depende de ellos.
+3. No hace falta renombrar ni modificar los GPX.
+4. Abrir:
+   https://cronozeta.free.je/index.html
+   (o el nombre que uses para el HTML)
+5. Esta versión incorpora las geometrías de los 4 recorridos dentro del HTML:
+   3K azul, 9K verde, 13K naranja, 21K rojo.
+6. También incorpora puntos de salida/meta, control y puntos de hidratación.
+7. Leaflet y OpenStreetMap siguen siendo los únicos recursos externos necesarios para el mapa.
