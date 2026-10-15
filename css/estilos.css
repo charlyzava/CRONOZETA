@@ -4,11 +4,18 @@
     padding: 0;
 }
 
+
+
+
+
+
+
 body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
     color: #222;
 }
+
 
 
 /* MENU */
@@ -43,6 +50,49 @@ body {
 .navbar a:hover {
     color: #f58220;
 }
+
+
+/*DROPDOWN*/
+/* Contenedor del submenú */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Opciones ocultas inicialmente */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    background: #222;
+    border-radius: 6px;
+    padding: 6px 0;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Enlaces del submenú */
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Efecto al pasar el mouse */
+.dropdown-menu a:hover {
+    background: #444;
+}
+
+/* Mostrar el submenú al pasar el mouse */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+/*DROPDOWN*/
+
 
 
 /* HERO */
